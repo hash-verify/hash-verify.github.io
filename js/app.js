@@ -171,9 +171,10 @@
     var G = window.PFGames || {};
     var cfg = GAME_CONFIG[game] || GAME_CONFIG[DEFAULT_GAME];
     if (!cfg) return;
+    var requiresNonce = !(game === "between" || game === "crash");
     var missingServer = !(el.serverSeed.value || "").trim();
     var missingClient = !(el.clientSeed.value || "").trim();
-    var missingNonce = !(el.nonce.value || "").toString().trim();
+    var missingNonce = requiresNonce && !(el.nonce.value || "").toString().trim();
     if (missingServer || missingClient || missingNonce) {
       var missingFields = [];
       if (missingServer) missingFields.push("Server Seed");
