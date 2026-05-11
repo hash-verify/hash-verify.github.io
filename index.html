@@ -1,9 +1,19 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Provably Fair Verifier</title>
+  <meta
+    name="description"
+    content="Open-source-style verification tool: step through HMAC-SHA256 derivation from your seeds and compare hashes, random values, and final payouts—no server calls required."
+  />
+  <meta property="og:title" content="Provably Fair Verifier" />
+  <meta
+    property="og:description"
+    content="Open-source-style verification tool: step through HMAC-SHA256 derivation from your seeds and compare hashes, random values, and final payouts—no server calls required."
+  />
+  <meta property="og:type" content="website" />
   <link rel="stylesheet" href="./css/main.css?v=20260428-1" />
 </head>
 <body>
@@ -16,20 +26,22 @@
         <div class="field full">
           <label for="game">Game</label>
           <select id="game">
-            <option value="dice">Dice</option>
-            <option value="roulette">Roulette</option>
-            <option value="hash28">Hash28</option>
-            <option value="flipcoin">Flip Coin</option>
-            <option value="hilo">HiLo</option>
-            <option value="videopoker">Video Poker</option>
             <option value="baccarat">Baccarat</option>
-            <option value="towerlegend">Tower Legend</option>
             <option value="between">Between</option>
+            <option value="bobing">Bobing</option>
+            <option value="cockfight">Cockfight</option>
             <option value="crash">Crash</option>
+            <option value="dice" selected>Dice</option>
+            <option value="flipcoin">Flip Coin</option>
+            <option value="hash28">Hash28</option>
+            <option value="hilo">HiLo</option>
             <option value="limbo">Limbo</option>
             <option value="mine">Mine</option>
+            <option value="roulette">Roulette</option>
+            <option value="towerlegend">Tower Legend</option>
+            <option value="videopoker">Video Poker</option>
+            <option value="xocdia">Xoc Dia</option>
             <option value="zodiac">Zodiac</option>
-            <option value="bobing">Bobing</option>
           </select>
         </div>
 
@@ -58,14 +70,9 @@
           <input id="flipCount" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="1" value="1" />
         </div>
 
-        <div id="betweenCountField" class="field full hidden">
-          <label for="betweenCount">Round Count</label>
-          <input id="betweenCount" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="1" value="1" />
-        </div>
-
-        <div id="crashCountField" class="field full hidden">
-          <label for="crashCount">Round Count</label>
-          <input id="crashCount" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="1" value="1" />
+        <div id="roundCountField" class="field full hidden">
+          <label for="roundCount">Round Count</label>
+          <input id="roundCount" type="text" inputmode="numeric" pattern="[0-9]*" placeholder="1" value="1" />
         </div>
 
         <div id="mineCountField" class="field full hidden">
@@ -100,29 +107,34 @@
     </section>
 
     <section id="resultPanel" class="panel hidden">
-      <div id="resultHashLine" class="result-line"><span class="k">Result Hash:</span><span id="resultHash">-</span></div>
-      <div id="hash28BallsCrate" class="hidden"></div>
-      <div id="first4BytesLine" class="result-line"><span class="k">4 Bytes (Hex):</span><span id="first4BytesHex">-</span></div>
-      <div id="first4BytesDecLine" class="result-line"><span class="k">4 Bytes (Dec):</span><span id="first4BytesDec">-</span></div>
-      <div id="randomRLine" class="result-line"><span class="k">Random Number (0–1) (R):</span><span id="randomR">-</span></div>
-      <div id="groupHexLine" class="result-line hidden"><span class="k">Hash28 Groups (Hex):</span><span id="groupHex">-</span></div>
-      <div id="groupValuesLine" class="result-line hidden"><span class="k">Hash28 Group Values:</span><span id="groupValues">-</span></div>
-      <div id="flipModules" class="hidden"></div>
-      <div id="hiloModules" class="hidden"></div>
-      <div id="videopokerModules" class="hidden"></div>
-      <div id="baccaratModules" class="hidden"></div>
-      <div id="towerModules" class="hidden"></div>
-      <div id="betweenModules" class="hidden"></div>
-      <div id="crashModules" class="hidden"></div>
-      <div id="mineModules" class="hidden"></div>
-      <div id="bobingModules" class="hidden"></div>
-      <div id="mineGridLine" class="result-line hidden"><span class="k">Mine Grid (5x5):</span><div id="mineGrid" class="cell-grid" style="--cell-n: 5"></div></div>
-      <div id="towerGridLine" class="result-line hidden"><span class="k">Tower Grid:</span><div id="towerGrid" class="tower-grid"></div></div>
-      <div id="zodiacModules" class="hidden"></div>
-      <div id="zodiacGridLine" class="result-line hidden"><span class="k">Zodiac Grid:</span><div id="zodiacGrid" class="cell-grid" style="--cell-n: 5"></div></div>
-      <div id="mappedLine" class="result-line"><span id="mappedLabel" class="k">Scaled Value:</span><span id="diceNumber">-</span></div>
-      <div id="limboFormulaLine" class="result-line hidden"><span class="k">Formula Value:</span><span id="limboFormula">-</span></div>
-      <div id="finalLine" class="result-line"><span id="finalLabel" class="k">Final Result:</span><span id="diceResult">-</span></div>
+      <div id="missingInputBlock" class="hidden">
+        <div class="result-line hash28-ball" id="missingInputText"></div>
+      </div>
+      <div id="resultDetailBlock">
+        <div id="resultHashLine" class="result-line"><span class="k">Result Hash:</span><span id="resultHash">-</span></div>
+        <div id="hash28BallsCrate" class="hidden"></div>
+        <div id="first4BytesLine" class="result-line"><span class="k">4 Bytes (Hex):</span><span id="first4BytesHex">-</span></div>
+        <div id="first4BytesDecLine" class="result-line"><span class="k">4 Bytes (Dec):</span><span id="first4BytesDec">-</span></div>
+        <div id="randomRLine" class="result-line"><span class="k">Random Number (0–1) (R):</span><span id="randomR">-</span></div>
+        <div id="groupHexLine" class="result-line hidden"><span class="k">Hash28 Groups (Hex):</span><span id="groupHex">-</span></div>
+        <div id="groupValuesLine" class="result-line hidden"><span class="k">Hash28 Group Values:</span><span id="groupValues">-</span></div>
+        <div id="flipModules" class="hidden"></div>
+        <div id="hiloModules" class="hidden"></div>
+        <div id="videopokerModules" class="hidden"></div>
+        <div id="baccaratModules" class="hidden"></div>
+        <div id="towerModules" class="hidden"></div>
+        <div id="betweenModules" class="hidden"></div>
+        <div id="crashModules" class="hidden"></div>
+        <div id="mineModules" class="hidden"></div>
+        <div id="bobingModules" class="hidden"></div>
+        <div id="mineGridLine" class="result-line hidden"><span class="k">Mine Grid (5x5):</span><div id="mineGrid" class="cell-grid" style="--cell-n: 5"></div></div>
+        <div id="towerGridLine" class="result-line hidden"><span class="k">Tower Grid:</span><div id="towerGrid" class="tower-grid"></div></div>
+        <div id="zodiacModules" class="hidden"></div>
+        <div id="zodiacGridLine" class="result-line hidden"><span class="k">Zodiac Grid:</span><div id="zodiacGrid" class="cell-grid" style="--cell-n: 5"></div></div>
+        <div id="mappedLine" class="result-line"><span id="mappedLabel" class="k">Scaled Value:</span><span id="diceNumber">-</span></div>
+        <div id="limboFormulaLine" class="result-line hidden"><span class="k">Formula Value:</span><span id="limboFormula">-</span></div>
+        <div id="finalLine" class="result-line"><span id="finalLabel" class="k">Final Result:</span><span id="diceResult">-</span></div>
+      </div>
       <div class="result-line"><span class="k">Seed Verification:</span><span id="serverStatus">-</span></div>
     </section>
 
@@ -138,7 +150,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.2.0/crypto-js.min.js"></script>
   <script src="./js/helpers.js?v=20260428-1"></script>
-  <script src="./js/game-config.js?v=20260428-1"></script>
+  <script src="./js/game-config.js?v=20260428-4"></script>
   <script src="./js/games/common.js?v=20260428-1"></script>
   <script src="./js/games/dice.js?v=20260428-1"></script>
   <script src="./js/games/roulette.js?v=20260428-1"></script>
@@ -148,12 +160,14 @@
   <script src="./js/games/videopoker.js?v=20260428-1"></script>
   <script src="./js/games/baccarat.js?v=20260428-1"></script>
   <script src="./js/games/towerlegend.js?v=20260428-1"></script>
-  <script src="./js/games/between.js?v=20260428-1"></script>
-  <script src="./js/games/crash.js?v=20260428-1"></script>
+  <script src="./js/games/between.js?v=20260428-2"></script>
+  <script src="./js/games/xocdia.js?v=20260428-4"></script>
+  <script src="./js/games/cockfight.js?v=20260428-3"></script>
+  <script src="./js/games/crash.js?v=20260428-2"></script>
   <script src="./js/games/limbo.js?v=20260428-1"></script>
   <script src="./js/games/mine.js?v=20260428-1"></script>
   <script src="./js/games/zodiac.js?v=20260428-1"></script>
   <script src="./js/games/bobing.js?v=20260428-1"></script>
-  <script src="./js/app.js?v=20260428-2"></script>
+  <script src="./js/app.js?v=20260428-11"></script>
 </body>
 </html>

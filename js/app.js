@@ -12,10 +12,8 @@
     nonce: document.getElementById("nonce"),
     flipCountField: document.getElementById("flipCountField"),
     flipCount: document.getElementById("flipCount"),
-    betweenCountField: document.getElementById("betweenCountField"),
-    betweenCount: document.getElementById("betweenCount"),
-    crashCountField: document.getElementById("crashCountField"),
-    crashCount: document.getElementById("crashCount"),
+    roundCountField: document.getElementById("roundCountField"),
+    roundCount: document.getElementById("roundCount"),
     mineCountField: document.getElementById("mineCountField"),
     mineCount: document.getElementById("mineCount"),
     zodiacDiffField: document.getElementById("zodiacDiffField"),
@@ -24,6 +22,9 @@
     towerDifficulty: document.getElementById("towerDifficulty"),
     verifyBtn: document.getElementById("verifyBtn"),
     resultPanel: document.getElementById("resultPanel"),
+    missingInputBlock: document.getElementById("missingInputBlock"),
+    missingInputText: document.getElementById("missingInputText"),
+    resultDetailBlock: document.getElementById("resultDetailBlock"),
     resultHashLine: document.getElementById("resultHashLine"),
     first4BytesLine: document.getElementById("first4BytesLine"),
     first4BytesDecLine: document.getElementById("first4BytesDecLine"),
@@ -75,6 +76,7 @@
     if (p.has("clientSeed")) el.clientSeed.value = p.get("clientSeed") || "";
     if (p.has("nonce")) el.nonce.value = p.get("nonce") || "";
     if (p.has("series")) el.flipCount.value = p.get("series") || "";
+    if (p.has("roundCount")) el.roundCount.value = p.get("roundCount") || "";
   }
 
   function setStatus(text, ok) {
@@ -93,8 +95,7 @@
 
   var VIEW_KEYS = [
     "flipCountField",
-    "betweenCountField",
-    "crashCountField",
+    "roundCountField",
     "mineCountField",
     "zodiacDiffField",
     "towerDiffField",
@@ -144,7 +145,8 @@
     if (!cfg) return;
     hideAllViewKeys();
     showViewKeys(cfg.show);
-    var isBetweenLike = game === "between" || game === "crash";
+    var isBetweenLike =
+      game === "between" || game === "crash" || game === "xocdia" || game === "cockfight";
     el.serverSeedHashField.classList.toggle("hidden", isBetweenLike);
     el.nonceField.classList.toggle("hidden", isBetweenLike);
     if (isBetweenLike) {
@@ -153,7 +155,7 @@
         grid.insertBefore(el.clientSeedField, el.serverSeedField);
       }
       el.clientSeedField.classList.add("full");
-      el.serverSeedField.querySelector("label").textContent = "Server Seed";
+      el.serverSeedField.querySelector("label").textContent = "Server Seed (Game hash)";
     } else {
       var defaultGrid = el.serverSeedField.parentElement;
       if (defaultGrid && el.clientSeedField && el.serverSeedField && el.serverSeedHashField) {
@@ -172,53 +174,36 @@
     var G = window.PFGames || {};
     var cfg = GAME_CONFIG[game] || GAME_CONFIG[DEFAULT_GAME];
     if (!cfg) return;
-    var requiresNonce = !(game === "between" || game === "crash");
+    var requiresNonce = !(
+      game === "between" ||
+      game === "crash" ||
+      game === "xocdia" ||
+      game === "cockfight"
+    );
     var missingServer = !(el.serverSeed.value || "").trim();
     var missingClient = !(el.clientSeed.value || "").trim();
     var missingNonce = requiresNonce && !(el.nonce.value || "").toString().trim();
     if (missingServer || missingClient || missingNonce) {
       var missingFields = [];
-      if (missingServer) missingFields.push("Server Seed");
+      var serverMissingLabel =
+        game === "between" ||
+        game === "crash" ||
+        game === "xocdia" ||
+        game === "cockfight"
+          ? "Server Seed (Game hash)"
+          : "Server Seed";
+      if (missingServer) missingFields.push(serverMissingLabel);
       if (missingClient) missingFields.push("Client Seed");
       if (missingNonce) missingFields.push("Nonce");
       var msg = "Please input " + missingFields.join(", ") + ".";
-      var shown = false;
-      var messageTargets = [
-        "flipModules",
-        "hiloModules",
-        "videopokerModules",
-        "baccaratModules",
-        "towerModules",
-        "betweenModules",
-        "crashModules",
-        "mineModules",
-        "zodiacModules",
-        "bobingModules",
-        "hash28BallsCrate"
-      ];
-      for (var i = 0; i < messageTargets.length; i += 1) {
-        var key = messageTargets[i];
-        if (cfg.show.indexOf(key) !== -1 && el[key]) {
-          el[key].innerHTML = '<div class="hash28-ball">' + msg + "</div>";
-          shown = true;
-          break;
-        }
-      }
-      if (!shown && el.crashModules) {
-        el.crashModules.innerHTML = '<div class="hash28-ball">' + msg + "</div>";
-      }
-      el.resultHash.textContent = "-";
-      el.first4BytesHex.textContent = "-";
-      el.first4BytesDec.textContent = "-";
-      el.randomR.textContent = "-";
-      el.groupHex.textContent = "-";
-      el.groupValues.textContent = "-";
-      el.limboFormula.textContent = "-";
-      el.diceNumber.textContent = "-";
-      el.diceResult.textContent = "-";
+      el.missingInputText.textContent = msg;
+      el.missingInputBlock.classList.remove("hidden");
+      el.resultDetailBlock.classList.add("hidden");
       setStatus("MISMATCH", false);
       return;
     }
+    el.missingInputBlock.classList.add("hidden");
+    el.resultDetailBlock.classList.remove("hidden");
     var fn = G[cfg.verifyKey];
     if (!fn) return;
     fn({ el: el, H: window.PFHelpers, setStatus: setStatus });

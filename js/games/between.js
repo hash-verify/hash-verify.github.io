@@ -7,10 +7,10 @@ window.PFGames.verifyBetween = function (ctx) {
   var C = window.PFGamesCommon;
   var serverSeed = (el.serverSeed.value || "").trim();
   var clientSeed = (el.clientSeed.value || "").trim();
-  var gameCount = parseInt((el.betweenCount.value || "").trim(), 10);
+  var gameCount = parseInt((el.roundCount.value || "").trim(), 10);
   if (!Number.isFinite(gameCount) || gameCount < 1) gameCount = 1;
   if (gameCount > 200) gameCount = 200;
-  el.betweenCount.value = String(gameCount);
+  el.roundCount.value = String(gameCount);
 
   function cardFromIndex(idx) {
     var suits = ["♦", "♥", "♠", "♣"];

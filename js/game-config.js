@@ -60,14 +60,28 @@ window.PFGameConfig = {
     subtitle: "Between · HMAC_SHA256(serverSeed, clientSeed)",
     mappedLabel: "Scaled Value:",
     finalLabel: "Final Result:",
-    show: ["betweenCountField", "betweenModules"]
+    show: ["roundCountField", "betweenModules"]
+  },
+  xocdia: {
+    verifyKey: "verifyXocdia",
+    subtitle: "Xoc Dia · HMAC_SHA256(serverSeed, clientSeed)",
+    mappedLabel: "Scaled Value:",
+    finalLabel: "Final Result:",
+    show: ["roundCountField", "betweenModules"]
+  },
+  cockfight: {
+    verifyKey: "verifyCockfight",
+    subtitle: "Cockfight · HMAC_SHA256(serverSeed, clientSeed)",
+    mappedLabel: "Scaled Value:",
+    finalLabel: "Final Result:",
+    show: ["roundCountField", "betweenModules"]
   },
   crash: {
     verifyKey: "verifyCrash",
     subtitle: "Crash · HMAC_SHA256(serverSeed, clientSeed)",
     mappedLabel: "Scaled Value:",
     finalLabel: "Final Result:",
-    show: ["crashCountField", "crashModules"]
+    show: ["roundCountField", "crashModules"]
   },
   limbo: {
     verifyKey: "verifyLimbo",
